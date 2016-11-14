@@ -6,7 +6,7 @@ sendAlert=0
 todolist="todo.list"
 
 echo "To: YOUR URL" > $todolist 
-echo "From: Secretariat de M. Garcia <alertes@ogarcia.fr>" >>  $todolist
+echo "From: Secretariat de M. Garcia <SENDER>" >>  $todolist
 echo "Subject: Rapport d'activite de veille" >>  $todolist
 echo "Content-Type: text/text; charset=utf-8" >>  $todolist
 
