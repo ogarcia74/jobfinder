@@ -5,7 +5,7 @@ PATH=/opt/wring/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 sendAlert=0
 todolist="todo.list"
 
-echo "To: olivier.garcia84@gmail.com" > $todolist 
+echo "To: YOUR URL" > $todolist 
 echo "From: Secretariat de M. Garcia <alertes@ogarcia.fr>" >>  $todolist
 echo "Subject: Rapport d'activite de veille" >>  $todolist
 echo "Content-Type: text/text; charset=utf-8" >>  $todolist
