@@ -1,60 +1,71 @@
+PATH=/opt/wring/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-todolist="/home/olivier/Documents/emploi/todo.list"
-emailcontent="Voici les nouvelles offres"
+#sender should be configured
+
 sendAlert=0
+todolist="todo.list"
 
 echo "To: olivier.garcia84@gmail.com" > $todolist 
-echo "From: Secrétariat de M. Garcia <alertes@ogarcia.fr>" >> $todolist
-echo "Subject: Rapport d'activité de veille" >> $todolist
-echo "Content-Type: text/text; charset=utf-8" >> $todolist
+echo "From: Secretariat de M. Garcia <alertes@ogarcia.fr>" >>  $todolist
+echo "Subject: Rapport d'activite de veille" >>  $todolist
+echo "Content-Type: text/text; charset=utf-8" >>  $todolist
 
 
-# --------------- SITE DE l'ETAT -----------------------
 
-url_a_parser='http://ge.ch/etat-employeur/places-vacantes'
-file_compare="etat.txt"
-echo "visite du site de l'etat"
-wring text  $url_a_parser '.offre >  h4 > a'   > tmp_$file_compare
-diff $file_compare tmp_$file_compare > diff.txt
-if [ -s diff.txt ]
+function letsGetSomeContent 
+{
+#$1 = URL
+#$2 = DOM to retrieve
+#$3 = file to compare
+#$4 = Site name
+
+#echo "Test de $3 '$2'"
+wring text $1 "$2" > tmp_$3
+
+#si on récupère bien qq chose
+if [ -s tmp_$3 ]
 then
- echo "Nouvelles offres d'emploi à l'Etat :" >> $todolist
- cat diff.txt >> $todolist 
- 
+diff tmp_$3 $3 > diff.txt
 
- echo "-----------------------" >> $todolist 
-sendAlert="1"
-fi
-rm $file_compare
-mv tmp_$file_compare $file_compare
+	if [ -s diff.txt ]
+	then
+ 	echo "Nouvelles offres d'emploi $3 $1 :" >>  $todolist
+ 	cat diff.txt  >>  $todolist
+	echo "-----------------------"  >>  $todolist
+	echo "-----------------------"  >>  $todolist
+	sendAlert=1
+	fi
+rm $3
+mv tmp_$3 $3
 rm diff.txt
-
-
-# --------------- ALLTITUDE -----------------------
-echo "alltitude"
-url_a_parser='http://www.alltitude.com/openpositions'
-file_compare="alltitude.txt"
-
-wring text  $url_a_parser '.opp_title'   > tmp_$file_compare
-diff $file_compare tmp_$file_compare > diff.txt
-if [ -s diff.txt ]
-then
-  echo "Nouvelles offres d'emploi à ALLTITUDE :" >> $todolist
- cat diff.txt >> $todolist
-	sendAlert="1"
+else
+rm tmp_$3
+echo "$(date +'%Y%m%d %T') - nothing found for $3" >> veilleErreur.log
 fi
-rm $file_compare
-mv tmp_$file_compare $file_compare
-rm diff.txt
+}  
+
+
+# LISTE DES SITES
+
+# ETAT
+letsGetSomeContent 'WebsiteURL' 'DOM' 'FILE'
+
+#------------------------------------------------
+#DO NOT TOUCH HERE
+#-----------------------
+
+
+
 
 #EMAIL ALERT
 
-if [ "$sendAlert" = "1" ]; then
-   cat $todolist | msmtp olivier.garcia84@gmail.com
+if [ "$sendAlert" -eq "1" ]; then
+   #echo "OK ON ENVOI LE MAIL"
+   cat $todolist | msmtp YOUREMAIL ADRESS
 fi
 
-#jobup
-#url_a_parser='http://www.jobup.ch/b2c/USR_joblist.asp?cmd=showresults&subcategories=,28,52,62,79,205,199,13,197,42,71,1,198,88,196,20,60,&cantons=GE1,GE2,GE3,VD1,GE&companytypes=0&jobmailerid=870343#1/1273857'
-#file_compare="jobup.txt"
-#wring text  $url_a_parser '#jobs_list .C_URL'   > tmp_$file_compare
+
+
+#FINALY DELETING TODO LIST
+rm $todolist
 
