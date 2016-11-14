@@ -1,13 +1,14 @@
 PATH=/opt/wring/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 #sender should be configured
-
+toEMail="fakesender@ogarcia.fr"
+fromEMail="My Alert Task <noreply@ogarcia.fr>"
 sendAlert=0
 todolist="todo.list"
 
 echo "To: YOUR URL" > $todolist 
-echo "From: Secretariat de M. Garcia <SENDER>" >>  $todolist
-echo "Subject: Rapport d'activite de veille" >>  $todolist
+echo "From: $fromEMail " >>  $todolist
+echo "Subject: Activity report " >>  $todolist
 echo "Content-Type: text/text; charset=utf-8" >>  $todolist
 
 
@@ -19,10 +20,9 @@ function letsGetSomeContent
 #$3 = file to compare
 #$4 = Site name
 
-#echo "Test de $3 '$2'"
 wring text $1 "$2" > tmp_$3
 
-#si on récupère bien qq chose
+
 if [ -s tmp_$3 ]
 then
 diff tmp_$3 $3 > diff.txt
@@ -45,7 +45,7 @@ fi
 }  
 
 
-# LISTE DES SITES
+# WEB SITE LIST
 
 # ETAT
 letsGetSomeContent 'WebsiteURL' 'DOM' 'FILE'
@@ -60,7 +60,6 @@ letsGetSomeContent 'WebsiteURL' 'DOM' 'FILE'
 #EMAIL ALERT
 
 if [ "$sendAlert" -eq "1" ]; then
-   #echo "OK ON ENVOI LE MAIL"
    cat $todolist | msmtp YOUREMAIL ADRESS
 fi
 
